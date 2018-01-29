@@ -1,0 +1,7 @@
+To make local PC as a server using Apache on Windows 7, need to config below setting
+
+Go to control panel > windows firewall > advance setting (on left sidebar)
+then
+
+Right click on inbound rules -> add new rule -> port -> TCP (Specific port 80 - if your localhost wok on this port) -> Allow the connections -> Give a profile name -> ok
+Now Restart all the services of Apache server & you are done..

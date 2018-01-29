@@ -1,0 +1,152 @@
+create database qsg_utf8 CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+create table QSG_USER ( 
+ID INT KEY NOT NULL AUTO_INCREMENT,
+email CHAR(100) NOT NULL UNIQUE,
+name char(100) NOT NULL,
+password CHAR(100) NOT NULL,
+phone CHAR(30) NOT NULL,
+address VARCHAR(200),
+login_time DATETIME,
+valid_device_token boolean default false,
+device_token varchar(100),
+credit_point SMALLINT NOT NULL DEFAULT 0
+);
+
+update qsg_user set email = 'walkin@qsg.com', name = 'walk in customer' where ID = 1;
+CREATE DATABASE qsg_user_test_1 CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+create table QSG_USER_TEST_1( 
+name varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci
+);
+
+insert into qsg_user_test_1 values ('ÖÐÎÄ');
+
+create table QSG_USER( 
+ID INT KEY NOT NULL AUTO_INCREMENT,
+email CHAR(100) NOT NULL UNIQUE,
+name varchar(100) NOT NULL,
+password CHAR(100) NOT NULL,
+phone CHAR(30) NOT NULL,
+address VARCHAR(200),
+login_time DATETIME,
+credit_point SMALLINT NOT NULL DEFAULT 0
+);
+
+alter table QSG_USER add ( name char(100) NOT NULL );
+alter table QSG_USER add ( login_time DATETIME );
+alter table QSG_USER add ( credit_point SMALLINT DEFAULT 0 );
+
+alter table QSG_USER add ( valid_device_token boolean default false, device_token varchar(100) );
+
+insert into qsg_user VALUES (3, "abc","def","96964260","Singapore", "xsg"); //Can not work
+insert into qsg_user (email, password, phone, address, name ) VALUES ("abc","def","96964260","Singapore", "Ð¤Ê¥¹â");
+select ID from qsg_user where email = "abc" and password = "def";
+update qsg_user set name = "xsg1" where ID = 2;
+
+create table QSG_SHOP( 
+ID INT KEY NOT NULL AUTO_INCREMENT,
+email CHAR(100) NOT NULL UNIQUE,
+password CHAR(100) NOT NULL,
+name CHAR(100) NOT NULL,
+phone CHAR(30) NOT NULL,
+address VARCHAR(100) NOT NULL,
+postcode CHAR(20),
+introduction VARCHAR(500),
+open_hours VARCHAR(200),
+category TINYINT,
+current_q_num SMALLINT NOT NULL DEFAULT 0,
+month_q_num MEDIUMINT NOT NULL DEFAULT 0,
+total_q_number int  NOT NULL DEFAULT 0,
+latitude double,
+longitude double,
+recommended boolean default false,
+login_time DATETIME,
+active_time INT,
+logged_in boolean default false,
+valid_device_token boolean default false,
+device_token varchar(100)
+);
+
+//Need to flag to control if a shop is online or not
+alter table QSG_SHOP add ( current_q_num SMALLINT, month_q_num MEDIUMINT, total_q_number int );
+alter table QSG_SHOP add ( latitude double, longitude double );
+alter table QSG_SHOP add ( recommended boolean default false );
+alter table QSG_SHOP add ( active_time INT );
+alter table QSG_SHOP add ( open_hours VARCHAR(200) );
+alter table QSG_SHOP drop column logitude;
+update qsg_shop SET latitude = 1.449290, longitude = 103.819481;	//This will update all the rows
+
+insert into qsg_shop(email, password, name, phone, address, postcode,introduction, category ) VALUES ( "xsg@gmail.com", "123", "Faith Clinic", "96864260", "Sembawang", "753359", "Sembawang Clinic", 0 ); 
+
+select email, password, name, phone, address, postcode, introduction, category, total_q_number from qsg_shop order by total_q_number DESC LIMIT 10;
+
+select current_q_num from qsg_shop where ID = 1;
+
+update qsg_shop SET current_q_num = current_q_num + 1 where ID = 1;
+
+update qsg_shop SET recommended = true;
+
+select ID, email, name, phone, address, postcode, introduction, category from qsg_shop order by
+
+create table QSG_Q_TABLE
+(
+ID INT KEY NOT NULL AUTO_INCREMENT,
+user_id INT NOT NULL,
+shop_id INT NOT NULL,
+time DATETIME NOT NULL,
+status TINYINT default 0,
+process_time DATETIME default NULL,
+FOREIGN KEY ( user_id ) REFERENCES QSG_USER(ID),
+FOREIGN KEY ( shop_id ) REFERENCES QSG_SHOP(ID),
+customer_num TINYINT NOT NULL DEFAULT 1,
+q_no SMALLINT,
+);
+
+create table QSG_FAVORITE
+(
+ID INT KEY NOT NULL AUTO_INCREMENT,
+user_id INT NOT NULL,
+shop_id INT NOT NULL,
+FOREIGN KEY ( user_id ) REFERENCES QSG_USER(ID),
+FOREIGN KEY ( shop_id ) REFERENCES QSG_SHOP(ID)
+);
+
+create table QSG_FEED_BACK
+(
+ID INT KEY NOT NULL AUTO_INCREMENT,
+name CHAR(100),
+email CHAR(100),
+client_type TINYINT NOT NULL default 0,
+comment	varchar(2000) not NULL,
+time DATETIME NOT NULL
+);
+
+alter table QSG_Q_TABLE add ( customer_num TINYINT NOT NULL DEFAULT 1, q_no CHAR(10) );
+alter table QSG_Q_TABLE modify ( process_time DATETIME );
+ALTER TABLE QSG_Q_TABLE modify COLUMN process_time DATETIME NULL;
+ALTER TABLE QSG_Q_TABLE modify COLUMN q_no SMALLINT;
+alter table QSG_FEED_BACK add ( client_type TINYINT NOT NULL default 0 );
+alter table QSG_FEED_BACK add ( email CHAR(100) );
+
+insert into qsg_q_table (user_id, shop_id, time ) VALUES ( 1, 1, now() );
+update qsg_q_table set processed = true, process_time = now() where shop_id = 1 and user_id = 1;
+
+insert into QSG_Q_TABLE(user_id, shop_id, time ) VALUES ( 1, 1, now() );
+
+select q_no from qsg_q_table where shop_id = 2 and time > '2015-07-03 11:00:00' order by time desc;
+
+//Can not so easily insert Q into the list, need server send the request to shop client, 
+//shop client accept the request, then can the Q is success.
+
+truncate table qsg_q_table;	//Clear all rows in the table
+
+select qsg_user.email, qsg_q_table.time from qsg_user left join qsg_q_table on qsg_user.ID = qsg_q_table.user_id;
+
+select qsg_user.ID, qsg_user.email, qsg_user.name, qsg_user.phone, qsg_q_table.time from qsg_user left join qsg_q_table on qsg_user.ID = qsg_q_table.user_id where qsg_q_table.shop_id = 1;
+
+stop my sql service command on windows: net stop mysql
+
+select qsg_shop.ID, qsg_shop.email, qsg_shop.phone, qsg_shop.address, qsg_shop.postcode, qsg_shop.introduction, qsg_shop.category, qsg_shop.latitude, qsg_shop.longitude, count(*) as c from qsg_shop left join qsg_q_table on qsg_shop.ID = qsg_q_table.shop_id where qsg_q_table.time > '2015-06-05 12:00:00' and qsg_q_table.status = 1 group by qsg_shop.ID order by c desc limit 10;
+
+select q_no from qsg_q_table where user_id = 1 and status = 2 and time > '2015-07-07 12:00:00';
